@@ -1,0 +1,38 @@
+# BerberRandevuProje/docker-compose.yml
+
+version: '3.8'
+
+services:
+  # 1. PostgreSQL Veritabanı Servisi
+  db:
+    image: postgres:16-alpine # Hafif ve güncel bir PostgreSQL imajı
+    container_name: berber_db
+    restart: always
+    environment:
+      # Veritabanı ayarları - Bunlar .env dosyanızdaki ile EŞLEŞMELİDİR
+      POSTGRES_USER: berber_admin
+      POSTGRES_PASSWORD: cokgizlisifre
+      POSTGRES_DB: berber_randevu_db
+    ports:
+      - "5432:5432" # Host portu 5432'yi konteyner portu 5432'ye yönlendir
+    volumes:
+      - berber_data:/var/lib/postgresql/data # Verilerin kalıcı olması için volume
+
+  # 2. Node.js (Backend) Servisi (Opsiyonel ama tavsiye edilir)
+  # Bu, backend'i de Docker içinde çalıştırmak isterseniz kullanılır.
+  api:
+    build:
+      context: ./server # server klasörünü baz alarak Dockerfile ile imaj oluştur
+    container_name: berber_api
+    depends_on:
+      - db # db servisi başlamadan api başlamaz
+    ports:
+      - "5000:5000"
+    environment:
+      # Node.js için gerekli değişkenleri konteyner içine aktarır
+      DATABASE_URL: postgresql://berber_admin:cokgizlisifre@db:5432/berber_randevu_db
+      JWT_SECRET: RANDOM_GÜÇLÜ_BİR_ANAHTAR
+    # Eğer Node.js'i yerel makinede çalıştırmaya devam edecekseniz bu servisi ŞİMDİLİK atlayabilirsiniz.
+
+volumes:
+  berber_data: # Verilerin bilgisayarınızda kalıcı olarak depolanacağı alan

@@ -1,0 +1,10 @@
+/* client/styles/globals.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Opsiyonel: Genişlik ve yükseklik ayarı */
+html, body, #__next {
+height: 100%;
+}
